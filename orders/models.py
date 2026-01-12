@@ -16,7 +16,7 @@ class Order(models.Model):
     ordered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"ordered {self.id}  by {self.user.name}"
+        return f"ordered {self.id}  by {self.user.username}"
     
 
 class OrderItem(models.Model):
