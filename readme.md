@@ -33,6 +33,21 @@ python manage.py createsuperuser
 
 # 5. Run
 python manage.py runserver
+```
 
+Login First: Navigate to http://127.0.0.1:8000/api-auth/login/ and enter the superuser credentials you created during installation.
 
-## Login First: Navigate to http://127.0.0.1:8000/api-auth/login/ and enter the superuser credentials you created during installation.
+## 🗺️ API Endpoints
+
+Once you are logged in, you can access and test the following modules:
+
+| Endpoint | Description |
+| :--- | :--- |
+| `/admin/` | Django Admin Dashboard (Database Management) |
+| `/api/` | Main API Router Root |
+| `/api/accounts/` | User Registration & Profile Management |
+| `/api/products/` | Product Catalog and Inventory |
+| `/api/orders/` | Order Placement and Processing |
+| `/api/reviews/` | Customer Ratings and Feedback |
+
+---
