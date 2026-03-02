@@ -1,15 +1,21 @@
-from .serializers import OrderSerializer
+from django.shortcuts import render
+from .serializers import OrderSerializer, OrderItemSerializer
 from rest_framework import viewsets
-from .models import Order
-from rest_framework.permissions import IsAuthenticated
+from .models import Order,OrderItem
+
 # Create your views here.
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all().prefetch_related('items').order_by('-ordered_at')
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset
+    
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+class OrderItemViewSet(viewsets.ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+
+    def get_queryset(self):
+        return self.queryset

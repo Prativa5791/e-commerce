@@ -9,6 +9,5 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-
     def get_queryset(self):
         return self.queryset
