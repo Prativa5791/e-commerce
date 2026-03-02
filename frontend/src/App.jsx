@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -10,6 +11,8 @@ import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
 import Orders from './pages/Orders'
 import Auth from './pages/Auth'
+import Checkout from './pages/Checkout'
+import AdminDashboard from './pages/AdminDashboard'
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -35,8 +38,10 @@ function AnimatedRoutes() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/login" element={<Auth />} />
-          <Route path="/register" element={<Auth />} />
+          <Route path="/auth/login" element={<Auth />} />
+          <Route path="/auth/register" element={<Auth />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           {/* 404 fallback */}
           <Route path="*" element={
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
@@ -56,15 +61,17 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
-        <div className="min-h-screen bg-[#0a0a0f] text-white">
-          <Navbar />
-          <main>
-            <AnimatedRoutes />
-          </main>
-          <Footer />
-        </div>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <div className="min-h-screen bg-[#0a0a0f] text-white">
+            <Navbar />
+            <main>
+              <AnimatedRoutes />
+            </main>
+            <Footer />
+          </div>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

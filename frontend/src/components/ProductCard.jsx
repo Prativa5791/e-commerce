@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Star, ShoppingCart, Eye, Heart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -7,6 +7,7 @@ import { getBadgeColor } from '../data/products'
 import Toast from './Toast'
 
 export default function ProductCard({ product }) {
+    const navigate = useNavigate()
     const { addItem } = useCart()
     const [liked, setLiked] = useState(false)
     const [toastVisible, setToastVisible] = useState(false)
@@ -18,8 +19,14 @@ export default function ProductCard({ product }) {
         setTimeout(() => setToastVisible(false), 3000)
     }
 
-    const discount = product.originalPrice
-        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    // Support both API (snake_case) and legacy mock (camelCase) data
+    const imageUrl = product.image_url || product.image || ''
+    const originalPrice = product.original_price ?? product.originalPrice ?? null
+    const reviewsCount = product.reviews_count ?? product.reviews ?? 0
+    const inStock = product.in_stock ?? product.inStock ?? true
+
+    const discount = originalPrice
+        ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
         : null
 
     return (
@@ -34,10 +41,11 @@ export default function ProductCard({ product }) {
                     {/* Image */}
                     <div className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-900 to-gray-800">
                         <img
-                            src={product.image}
+                            src={imageUrl}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             loading="lazy"
+                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500&h=500&fit=crop' }}
                         />
                         {/* Overlay on hover */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -66,7 +74,7 @@ export default function ProductCard({ product }) {
                                     -{discount}%
                                 </span>
                             )}
-                            {!product.inStock && (
+                            {!inStock && (
                                 <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-700 text-gray-300 backdrop-blur-sm">
                                     Out of Stock
                                 </span>
@@ -99,24 +107,23 @@ export default function ProductCard({ product }) {
                                     />
                                 ))}
                             </div>
-                            <span className="text-xs text-gray-400">({product.reviews.toLocaleString()})</span>
+                            <span className="text-xs text-gray-400">({reviewsCount.toLocaleString()})</span>
                         </div>
 
                         {/* Price */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <span className="text-xl font-bold text-white">${product.price.toFixed(2)}</span>
-                                {product.originalPrice && (
-                                    <span className="text-sm text-gray-500 line-through">${product.originalPrice.toFixed(2)}</span>
+                                <span className="text-xl font-bold text-white">${Number(product.price).toFixed(2)}</span>
+                                {originalPrice && (
+                                    <span className="text-sm text-gray-500 line-through">${Number(originalPrice).toFixed(2)}</span>
                                 )}
                             </div>
-                            <Link
-                                to={`/products/${product.id}`}
-                                onClick={(e) => e.stopPropagation()}
+                            <button
+                                onClick={(e) => { e.preventDefault(); navigate(`/products/${product.id}`) }}
                                 className="p-2 glass rounded-xl hover:bg-violet-500/20 hover:text-violet-400 transition-all text-gray-500"
                             >
                                 <Eye className="w-4 h-4" />
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </Link>

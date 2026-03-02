@@ -7,17 +7,16 @@ User = get_user_model()
 class UserCreationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
-        model=UserCreation
-        fields= ["username", "email", "mobile", "password"]
+        model = UserCreation
+        fields = ["username", "email", "mobile", "password", "is_seller"]
+        read_only_fields = ["is_seller"]
 
-    def create(self,validated_data):
+    def create(self, validated_data):
         password = validated_data.pop('password')
-        user = UserCreation.objects.create_user(**validated_data)
-        user.set_password(password)
-        user.save()
+        user = UserCreation.objects.create_user(password=password, **validated_data)
         return user
-    
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
-        
+

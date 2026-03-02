@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,10 +23,15 @@ class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
         return Response({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
+            'token': token.key,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_seller': user.is_seller,
+            },
             'message': 'User created successfully!!!'
         }, status=status.HTTP_201_CREATED)
 
@@ -39,7 +44,22 @@ class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
             token, _ = Token.objects.get_or_create(user=user)
             return Response({
                 'token': token.key,
-                'user': {'id': user.id, 'username': user.username}
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'is_seller': user.is_seller,
+                }
             })
         return Response({'error': 'Invalid credentials'},
                         status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False, methods=['get'], url_path='me', permission_classes=[IsAuthenticated])
+    def me(self, request):
+        user = request.user
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'is_seller': user.is_seller,
+        })

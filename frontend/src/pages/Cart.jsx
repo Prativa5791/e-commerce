@@ -1,11 +1,12 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, ShoppingCart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
 export default function Cart() {
     const { items, removeItem, updateQuantity, totalPrice, clearCart, totalItems } = useCart()
+    const navigate = useNavigate()
 
     if (items.length === 0) {
         return (
@@ -147,6 +148,7 @@ export default function Cart() {
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
+                            onClick={() => navigate('/checkout')}
                             className="w-full py-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 glow-purple"
                         >
                             Proceed to Checkout

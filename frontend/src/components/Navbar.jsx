@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Menu, X } from 'lucide-react'
+import { ShoppingCart, Menu, X, LogOut, User, LayoutDashboard } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import CartDrawer from './CartDrawer'
 
-// Nepali Store logo — red store icon
 const NepaliStoreLogo = () => (
     <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -18,16 +18,11 @@ const NepaliStoreLogo = () => (
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
         </defs>
-        {/* Background circle */}
         <circle cx="18" cy="18" r="17" fill="url(#storeGrad)" filter="url(#storeGlow)" />
-        {/* Store roof / awning */}
         <rect x="7" y="13" width="22" height="4" rx="1" fill="white" opacity="0.95" />
         <polygon points="5,17 18,10 31,17" fill="white" opacity="0.9" />
-        {/* Store body */}
         <rect x="10" y="17" width="16" height="11" rx="1" fill="white" opacity="0.15" />
-        {/* Door */}
         <rect x="15" y="21" width="6" height="7" rx="1" fill="white" opacity="0.95" />
-        {/* Windows */}
         <rect x="11" y="19" width="3" height="3" rx="0.5" fill="white" opacity="0.85" />
         <rect x="22" y="19" width="3" height="3" rx="0.5" fill="white" opacity="0.85" />
     </svg>
@@ -41,9 +36,18 @@ const navLinks = [
 
 export default function Navbar() {
     const { totalItems } = useCart()
+    const { user, isAuthenticated, logout } = useAuth()
     const [cartOpen, setCartOpen] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [dropdownOpen, setDropdownOpen] = useState(false)
     const location = useLocation()
+    const navigate = useNavigate()
+
+    const handleLogout = () => {
+        logout()
+        setDropdownOpen(false)
+        navigate('/')
+    }
 
     return (
         <>
@@ -87,12 +91,65 @@ export default function Navbar() {
 
                             {/* Actions */}
                             <div className="flex items-center gap-3">
-                                <Link
-                                    to="/auth/login"
-                                    className="hidden md:block text-sm text-gray-400 hover:text-white transition-colors duration-200 font-medium"
-                                >
-                                    Sign In
-                                </Link>
+                                {isAuthenticated ? (
+                                    <div className="relative hidden md:block">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                                            className="flex items-center gap-2 px-3 py-2 glass rounded-xl hover:bg-white/10 transition-all duration-200"
+                                        >
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                                                <User className="w-4 h-4 text-white" />
+                                            </div>
+                                            <span className="text-sm text-gray-300 font-medium">{user?.username}</span>
+                                        </motion.button>
+
+                                        <AnimatePresence>
+                                            {dropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                                    className="absolute right-0 mt-2 w-48 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl"
+                                                >
+                                                    {user?.is_seller && (
+                                                        <Link
+                                                            to="/admin-dashboard"
+                                                            onClick={() => setDropdownOpen(false)}
+                                                            className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                                                        >
+                                                            <LayoutDashboard className="w-4 h-4" />
+                                                            Dashboard
+                                                        </Link>
+                                                    )}
+                                                    <Link
+                                                        to="/orders"
+                                                        onClick={() => setDropdownOpen(false)}
+                                                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <ShoppingCart className="w-4 h-4" />
+                                                        My Orders
+                                                    </Link>
+                                                    <button
+                                                        onClick={handleLogout}
+                                                        className="flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors w-full text-left border-t border-white/10"
+                                                    >
+                                                        <LogOut className="w-4 h-4" />
+                                                        Sign Out
+                                                    </button>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                ) : (
+                                    <Link
+                                        to="/auth/login"
+                                        className="hidden md:block text-sm text-gray-400 hover:text-white transition-colors duration-200 font-medium"
+                                    >
+                                        Sign In
+                                    </Link>
+                                )}
 
                                 {/* Cart Button */}
                                 <motion.button
@@ -152,13 +209,25 @@ export default function Navbar() {
                                             {link.label}
                                         </Link>
                                     ))}
-                                    <Link
-                                        to="/auth/login"
-                                        onClick={() => setMobileOpen(false)}
-                                        className="text-sm text-gray-400 hover:text-white py-2 px-3"
-                                    >
-                                        Sign In
-                                    </Link>
+                                    {isAuthenticated ? (
+                                        <>
+                                            {user?.is_seller && (
+                                                <Link to="/admin-dashboard" onClick={() => setMobileOpen(false)}
+                                                    className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2">
+                                                    <LayoutDashboard className="w-4 h-4" /> Dashboard
+                                                </Link>
+                                            )}
+                                            <button onClick={() => { handleLogout(); setMobileOpen(false) }}
+                                                className="text-sm text-red-400 hover:text-red-300 py-2 px-3 text-left flex items-center gap-2">
+                                                <LogOut className="w-4 h-4" /> Sign Out
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <Link to="/auth/login" onClick={() => setMobileOpen(false)}
+                                            className="text-sm text-gray-400 hover:text-white py-2 px-3">
+                                            Sign In
+                                        </Link>
+                                    )}
                                 </div>
                             </motion.nav>
                         )}

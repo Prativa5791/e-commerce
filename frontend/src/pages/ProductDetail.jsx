@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RefreshCw } from 'lucide-react'
+import { Star, ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RefreshCw, Zap } from 'lucide-react'
 import { PRODUCTS, getBadgeColor } from '../data/products'
 import { useCart } from '../context/CartContext'
 import Toast from '../components/Toast'
@@ -41,6 +41,20 @@ export default function ProductDetail() {
         setAdded(true)
         setToast(true)
         setTimeout(() => { setAdded(false); setToast(false) }, 3000)
+    }
+
+    const handleBuyNow = () => {
+        navigate('/checkout', {
+            state: {
+                buyNowItem: {
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: quantity,
+                }
+            }
+        })
     }
 
     return (
@@ -163,10 +177,10 @@ export default function ProductDetail() {
                                 onClick={handleAddToCart}
                                 disabled={!product.inStock}
                                 className={`flex-1 flex items-center justify-center gap-3 py-4 font-bold text-white rounded-2xl transition-all duration-300 ${added
-                                        ? 'bg-emerald-600'
-                                        : !product.inStock
-                                            ? 'bg-gray-700 cursor-not-allowed opacity-60'
-                                            : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 glow-purple'
+                                    ? 'bg-emerald-600'
+                                    : !product.inStock
+                                        ? 'bg-gray-700 cursor-not-allowed opacity-60'
+                                        : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 glow-purple'
                                     }`}
                             >
                                 <AnimatePresence mode="wait">
@@ -181,6 +195,21 @@ export default function ProductDetail() {
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
+                            </motion.button>
+
+                            {/* Buy Now Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={handleBuyNow}
+                                disabled={!product.inStock}
+                                className={`flex items-center justify-center gap-2 px-6 py-4 font-bold text-white rounded-2xl transition-all duration-300 ${!product.inStock
+                                        ? 'bg-gray-700 cursor-not-allowed opacity-60'
+                                        : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-lg shadow-amber-500/25'
+                                    }`}
+                            >
+                                <Zap className="w-5 h-5" />
+                                Buy Now
                             </motion.button>
                         </div>
 
