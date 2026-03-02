@@ -1,4 +1,4 @@
-# === Python / Django ===
+# === Python / Django (works for root and backend/ subfolder) ===
 __pycache__/
 *.py[cod]
 *.pyo

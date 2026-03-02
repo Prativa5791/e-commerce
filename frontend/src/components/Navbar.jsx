@@ -1,9 +1,48 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Menu, X, Zap } from 'lucide-react'
+import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import CartDrawer from './CartDrawer'
+
+// P-gemstone logo — visually inspired by "Prativa" without using the name
+const PGemLogo = () => (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="gemGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#a855f7" />
+                <stop offset="50%" stopColor="#ec4899" />
+                <stop offset="100%" stopColor="#7c3aed" />
+            </linearGradient>
+            <linearGradient id="gemHighlight" x1="0" y1="0" x2="16" y2="16" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </linearGradient>
+            <filter id="gemGlow">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+        </defs>
+        {/* Hexagonal gemstone shape */}
+        <polygon
+            points="16,2 28,9 28,23 16,30 4,23 4,9"
+            fill="url(#gemGrad)"
+            filter="url(#gemGlow)"
+        />
+        {/* Inner facet highlight */}
+        <polygon
+            points="16,4 26,10 26,22 16,28 6,22 6,10"
+            fill="url(#gemHighlight)"
+            opacity="0.3"
+        />
+        {/* Face cut lines */}
+        <line x1="16" y1="2" x2="16" y2="30" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+        <line x1="4" y1="9" x2="28" y2="23" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+        <line x1="28" y1="9" x2="4" y2="23" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+        {/* "P" letter */}
+        <text x="11" y="21" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="13" fill="white" letterSpacing="-0.5">P</text>
+    </svg>
+)
 
 const navLinks = [
     { to: '/', label: 'Home' },
@@ -25,9 +64,13 @@ export default function Navbar() {
                         <div className="flex items-center justify-between h-16">
                             {/* Logo */}
                             <Link to="/" className="flex items-center gap-2 group">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg group-hover:shadow-violet-500/50 transition-shadow duration-300">
-                                    <Zap className="w-4 h-4 text-white" />
-                                </div>
+                                <motion.div
+                                    whileHover={{ scale: 1.1, rotate: 5 }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                    className="drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] group-hover:drop-shadow-[0_0_14px_rgba(236,72,153,0.8)] transition-all duration-300"
+                                >
+                                    <PGemLogo />
+                                </motion.div>
                                 <span className="font-bold text-lg gradient-text">NexShop</span>
                             </Link>
 
@@ -38,8 +81,8 @@ export default function Navbar() {
                                         key={link.to}
                                         to={link.to}
                                         className={`text-sm font-medium transition-colors duration-200 relative ${location.pathname === link.to
-                                                ? 'text-violet-400'
-                                                : 'text-gray-400 hover:text-white'
+                                            ? 'text-violet-400'
+                                            : 'text-gray-400 hover:text-white'
                                             }`}
                                     >
                                         {link.label}
@@ -113,8 +156,8 @@ export default function Navbar() {
                                             to={link.to}
                                             onClick={() => setMobileOpen(false)}
                                             className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors ${location.pathname === link.to
-                                                    ? 'bg-violet-500/20 text-violet-400'
-                                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                ? 'bg-violet-500/20 text-violet-400'
+                                                : 'text-gray-400 hover:text-white hover:bg-white/5'
                                                 }`}
                                         >
                                             {link.label}
