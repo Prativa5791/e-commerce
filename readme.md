@@ -1,53 +1,104 @@
-# E-Commerce Backend DJANGO
+# Nepali Store — Full Stack E-Commerce
 
-Robust e-commerce REST API built with **Django** + **Django REST Framework**
+A full-stack e-commerce web application built with **Django REST Framework** (backend) and **React + Vite + Tailwind CSS** (frontend).
 
-## Features
-- User registration & profiles  
-- Product catalog + categories  
-- Order management & history  
-- Product reviews & ratings  
-- Browsable API + session authentication
+---
 
-## Quick Start
+## Project Structure
+
+```
+ecommerce_web/
+├── backend/          # Django project
+│   ├── accounts/     # User registration & login
+│   ├── products/     # Product catalog & API
+│   ├── orders/       # Order management
+│   └── reviews/      # Product reviews
+├── frontend/         # React application (Vite)
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── lib/api.js  ← Axios API client
+│       └── context/
+└── env/              # Python virtual environment
+```
+
+---
+
+## Backend Setup (Django)
+
+### Prerequisites
+- Python 3.10+
+- pip
+
+### Installation
 
 ```bash
-# 1. Clone & enter project
-git clone https://github.com/Prativa5791/e-commerce.git
-cd e-commerce
+# 1. Create & activate virtual environment
+python3 -m venv env
+source env/bin/activate        # Linux/macOS
+env\Scripts\activate           # Windows
 
-# 2. Virtual environment
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
+# 2. Install dependencies
+pip install -r backend/requirements.txt
 
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Migrations & superuser
-python manage.py makemigrations
+# 3. Run migrations
+cd backend
 python manage.py migrate
+
+# 4. Seed product catalog (12 products)
+python manage.py loaddata products/fixtures/products_seed.json
+
+# 5. Create a superuser (optional — for /admin)
 python manage.py createsuperuser
 
-# 5. Run
+# 6. Start the development server
 python manage.py runserver
 ```
 
-Login First: Navigate to http://127.0.0.1:8000/api-auth/login/ and enter the superuser credentials you created during installation.
-
-## 🗺️ API Endpoints
-
-Once you are logged in, you can access and test the following modules:
-
-| Endpoint | Description |
-| :--- | :--- |
-| `/admin/` | Django Admin Dashboard (Database Management) |
-| `/api/` | Main API Router Root |
-| `/api/accounts/` | User Registration & Profile Management |
-| `/api/products/` | Product Catalog and Inventory |
-| `/api/orders/` | Order Placement and Processing |
-| `/api/reviews/` | Customer Ratings and Feedback |
+Backend runs at **http://127.0.0.1:8000**
 
 ---
+
+## Frontend Setup (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs at **http://localhost:5173**
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/accounts/users/register/` | No | Register a new user |
+| POST | `/api/accounts/users/login/` | No | Login & get token |
+| GET | `/api/products/` | No | List products (filter: `?category=`, `?search=`, `?in_stock=`) |
+| GET | `/api/products/:id/` | No | Single product detail |
+| GET | `/api/orders/` | **Yes** | List current user's orders |
+| POST | `/api/orders/` | **Yes** | Create a new order |
+
+> Auth: add `Authorization: Token <token>` header for protected endpoints.
+
+---
+
+## Features
+
+- 🛒 **Product catalog** — 12 seeded products across 5 categories
+- 🔍 **Search & filter** — by category, name, in-stock status
+- 🔐 **User auth** — token-based registration & login
+- 📦 **Order history** — per-user order list
+- 🛍️ **Shopping cart** — persisted in localStorage
+- 🎨 **Dark UI** — glassmorphism design with Nepali Store branding
+
+---
+
+## Environment
+
+- Django 4.x+ with DRF, Token Auth, CORS
+- React 18 + Vite + Tailwind CSS + Framer Motion
+- SQLite (development)

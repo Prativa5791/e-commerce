@@ -1,25 +1,52 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
-import { PRODUCTS, CATEGORIES } from '../data/products'
+import { productsApi } from '../lib/api'
+
+const CATEGORIES = ['All', 'Electronics', 'Fashion', 'Home & Living', 'Sports', 'Beauty', 'Other']
 
 export default function Products() {
+    const [products, setProducts] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
     const [search, setSearch] = useState('')
     const [category, setCategory] = useState('All')
     const [sortBy, setSortBy] = useState('default')
-    const [showFilters, setShowFilters] = useState(false)
 
-    const filtered = useMemo(() => {
-        let arr = [...PRODUCTS]
-        if (category !== 'All') arr = arr.filter((p) => p.category === category)
-        if (search) arr = arr.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+    // Fetch products from Django backend
+    useEffect(() => {
+        const controller = new AbortController()
+        const fetchProducts = async () => {
+            try {
+                setLoading(true)
+                setError(null)
+                const params = {}
+                if (category !== 'All') params.category = category
+                if (search) params.search = search
+                const { data } = await productsApi.getAll(params)
+                setProducts(Array.isArray(data) ? data : data.results ?? [])
+            } catch (err) {
+                if (err.name !== 'CanceledError') {
+                    setError('Failed to load products. Please ensure the backend is running.')
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchProducts()
+        return () => controller.abort()
+    }, [category, search])
+
+    // Client-side sort only (the backend already handles category & search filters)
+    const sorted = useMemo(() => {
+        const arr = [...products]
         if (sortBy === 'price-asc') arr.sort((a, b) => a.price - b.price)
         if (sortBy === 'price-desc') arr.sort((a, b) => b.price - a.price)
         if (sortBy === 'rating') arr.sort((a, b) => b.rating - a.rating)
-        if (sortBy === 'reviews') arr.sort((a, b) => b.reviews - a.reviews)
+        if (sortBy === 'reviews') arr.sort((a, b) => (b.reviews_count ?? 0) - (a.reviews_count ?? 0))
         return arr
-    }, [search, category, sortBy])
+    }, [products, sortBy])
 
     return (
         <div className="min-h-screen pt-24 pb-20 px-4">
@@ -32,7 +59,9 @@ export default function Products() {
                 >
                     <p className="text-violet-400 text-sm uppercase tracking-widest font-semibold mb-2">Catalog</p>
                     <h1 className="text-4xl font-black text-white mb-1">All Products</h1>
-                    <p className="text-gray-500">{filtered.length} items found</p>
+                    <p className="text-gray-500">
+                        {loading ? 'Loading…' : `${sorted.length} items found`}
+                    </p>
                 </motion.div>
 
                 {/* Controls */}
@@ -91,49 +120,72 @@ export default function Products() {
                     ))}
                 </div>
 
+                {/* States */}
+                {loading && (
+                    <div className="flex flex-col items-center justify-center py-32 gap-4">
+                        <Loader2 className="w-10 h-10 text-violet-400 animate-spin" />
+                        <p className="text-gray-400">Loading products…</p>
+                    </div>
+                )}
+
+                {error && !loading && (
+                    <div className="flex flex-col items-center justify-center py-32 gap-4">
+                        <AlertCircle className="w-12 h-12 text-red-400" />
+                        <p className="text-red-300 font-medium">{error}</p>
+                        <button
+                            onClick={() => setCategory(category)} // re-trigger effect
+                            className="px-5 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm rounded-xl transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
+
                 {/* Product Grid */}
-                <AnimatePresence mode="wait">
-                    {filtered.length === 0 ? (
-                        <motion.div
-                            key="empty"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="text-center py-24"
-                        >
-                            <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                                <Search className="w-10 h-10 text-gray-600" />
-                            </div>
-                            <p className="text-gray-400 text-lg font-medium">No products found</p>
-                            <p className="text-gray-600 text-sm mt-1">Try adjusting your search or filters</p>
-                            <button
-                                onClick={() => { setSearch(''); setCategory('All') }}
-                                className="mt-6 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors"
+                {!loading && !error && (
+                    <AnimatePresence mode="wait">
+                        {sorted.length === 0 ? (
+                            <motion.div
+                                key="empty"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="text-center py-24"
                             >
-                                Clear Filters
-                            </button>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="grid"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                        >
-                            {filtered.map((product, i) => (
-                                <motion.div
-                                    key={product.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.05 }}
+                                <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                                    <Search className="w-10 h-10 text-gray-600" />
+                                </div>
+                                <p className="text-gray-400 text-lg font-medium">No products found</p>
+                                <p className="text-gray-600 text-sm mt-1">Try adjusting your search or filters</p>
+                                <button
+                                    onClick={() => { setSearch(''); setCategory('All') }}
+                                    className="mt-6 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors"
                                 >
-                                    <ProductCard product={product} />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                    Clear Filters
+                                </button>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="grid"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                            >
+                                {sorted.map((product, i) => (
+                                    <motion.div
+                                        key={product.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                    >
+                                        <ProductCard product={product} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                )}
             </div>
         </div>
     )

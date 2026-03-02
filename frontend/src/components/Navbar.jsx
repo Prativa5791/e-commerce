@@ -5,42 +5,31 @@ import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import CartDrawer from './CartDrawer'
 
-// P-gemstone logo — visually inspired by "Prativa" without using the name
-const PGemLogo = () => (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+// Nepali Store logo — red store icon
+const NepaliStoreLogo = () => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-            <linearGradient id="gemGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#a855f7" />
-                <stop offset="50%" stopColor="#ec4899" />
-                <stop offset="100%" stopColor="#7c3aed" />
+            <linearGradient id="storeGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#dc2626" />
+                <stop offset="100%" stopColor="#b91c1c" />
             </linearGradient>
-            <linearGradient id="gemHighlight" x1="0" y1="0" x2="16" y2="16" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-            </linearGradient>
-            <filter id="gemGlow">
+            <filter id="storeGlow">
                 <feGaussianBlur stdDeviation="1.5" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
         </defs>
-        {/* Hexagonal gemstone shape */}
-        <polygon
-            points="16,2 28,9 28,23 16,30 4,23 4,9"
-            fill="url(#gemGrad)"
-            filter="url(#gemGlow)"
-        />
-        {/* Inner facet highlight */}
-        <polygon
-            points="16,4 26,10 26,22 16,28 6,22 6,10"
-            fill="url(#gemHighlight)"
-            opacity="0.3"
-        />
-        {/* Face cut lines */}
-        <line x1="16" y1="2" x2="16" y2="30" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-        <line x1="4" y1="9" x2="28" y2="23" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-        <line x1="28" y1="9" x2="4" y2="23" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-        {/* "P" letter */}
-        <text x="11" y="21" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="13" fill="white" letterSpacing="-0.5">P</text>
+        {/* Background circle */}
+        <circle cx="18" cy="18" r="17" fill="url(#storeGrad)" filter="url(#storeGlow)" />
+        {/* Store roof / awning */}
+        <rect x="7" y="13" width="22" height="4" rx="1" fill="white" opacity="0.95" />
+        <polygon points="5,17 18,10 31,17" fill="white" opacity="0.9" />
+        {/* Store body */}
+        <rect x="10" y="17" width="16" height="11" rx="1" fill="white" opacity="0.15" />
+        {/* Door */}
+        <rect x="15" y="21" width="6" height="7" rx="1" fill="white" opacity="0.95" />
+        {/* Windows */}
+        <rect x="11" y="19" width="3" height="3" rx="0.5" fill="white" opacity="0.85" />
+        <rect x="22" y="19" width="3" height="3" rx="0.5" fill="white" opacity="0.85" />
     </svg>
 )
 
@@ -65,13 +54,13 @@ export default function Navbar() {
                             {/* Logo */}
                             <Link to="/" className="flex items-center gap-2 group">
                                 <motion.div
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
+                                    whileHover={{ scale: 1.1, rotate: -5 }}
                                     transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                                    className="drop-shadow-[0_0_8px_rgba(168,85,247,0.7)] group-hover:drop-shadow-[0_0_14px_rgba(236,72,153,0.8)] transition-all duration-300"
+                                    className="drop-shadow-[0_0_10px_rgba(220,38,38,0.6)] group-hover:drop-shadow-[0_0_18px_rgba(220,38,38,0.9)] transition-all duration-300"
                                 >
-                                    <PGemLogo />
+                                    <NepaliStoreLogo />
                                 </motion.div>
-                                <span className="font-bold text-lg gradient-text">NexShop</span>
+                                <span className="font-bold text-lg" style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Nepali Store</span>
                             </Link>
 
                             {/* Desktop Nav */}
@@ -99,7 +88,7 @@ export default function Navbar() {
                             {/* Actions */}
                             <div className="flex items-center gap-3">
                                 <Link
-                                    to="/login"
+                                    to="/auth/login"
                                     className="hidden md:block text-sm text-gray-400 hover:text-white transition-colors duration-200 font-medium"
                                 >
                                     Sign In
@@ -164,7 +153,7 @@ export default function Navbar() {
                                         </Link>
                                     ))}
                                     <Link
-                                        to="/login"
+                                        to="/auth/login"
                                         onClick={() => setMobileOpen(false)}
                                         className="text-sm text-gray-400 hover:text-white py-2 px-3"
                                     >

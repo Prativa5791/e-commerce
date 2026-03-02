@@ -10,4 +10,15 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        return self.queryset
+        qs = Product.objects.all()
+        category = self.request.query_params.get('category')
+        search = self.request.query_params.get('search')
+        in_stock = self.request.query_params.get('in_stock')
+
+        if category and category != 'All':
+            qs = qs.filter(category=category)
+        if search:
+            qs = qs.filter(name__icontains=search)
+        if in_stock is not None:
+            qs = qs.filter(in_stock=in_stock.lower() == 'true')
+        return qs
