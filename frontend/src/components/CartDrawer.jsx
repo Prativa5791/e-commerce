@@ -94,7 +94,7 @@ export default function CartDrawer({ open, onClose }) {
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-white font-medium text-sm line-clamp-2 mb-1">{item.name}</p>
-                                                <p className="text-violet-400 font-bold">${item.price.toFixed(2)}</p>
+                                                <p className="text-violet-400 font-bold">${Number(item.price).toFixed(2)}</p>
                                                 <div className="flex items-center justify-between mt-3">
                                                     <div className="flex items-center gap-2">
                                                         <button
@@ -130,7 +130,7 @@ export default function CartDrawer({ open, onClose }) {
                             <div className="p-6 border-t border-white/10 space-y-4">
                                 <div className="flex justify-between text-sm text-gray-400">
                                     <span>Subtotal</span>
-                                    <span className="text-white font-medium">${totalPrice.toFixed(2)}</span>
+                                    <span className="text-white font-medium">${Number(totalPrice).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-400">
                                     <span>Shipping</span>
@@ -138,7 +138,7 @@ export default function CartDrawer({ open, onClose }) {
                                 </div>
                                 <div className="flex justify-between font-bold text-white text-lg border-t border-white/10 pt-4">
                                     <span>Total</span>
-                                    <span className="gradient-text">${totalPrice.toFixed(2)}</span>
+                                    <span className="gradient-text">${Number(totalPrice).toFixed(2)}</span>
                                 </div>
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}

@@ -49,7 +49,7 @@ export default function ProductDetail() {
                 buyNowItem: {
                     id: product.id,
                     name: product.name,
-                    price: product.price,
+                    price: Number(product.price),
                     image: product.image,
                     quantity: quantity,
                 }
@@ -132,11 +132,11 @@ export default function ProductDetail() {
 
                         {/* Price */}
                         <div className="flex items-center gap-4">
-                            <span className="text-5xl font-black gradient-text">${product.price.toFixed(2)}</span>
+                            <span className="text-5xl font-black gradient-text">${Number(product.price).toFixed(2)}</span>
                             {product.originalPrice && (
                                 <div>
-                                    <p className="text-gray-500 line-through text-lg">${product.originalPrice.toFixed(2)}</p>
-                                    <p className="text-emerald-400 text-sm font-semibold">Save ${(product.originalPrice - product.price).toFixed(2)}</p>
+                                    <p className="text-gray-500 line-through text-lg">${Number(product.originalPrice).toFixed(2)}</p>
+                                    <p className="text-emerald-400 text-sm font-semibold">Save ${(Number(product.originalPrice) - Number(product.price)).toFixed(2)}</p>
                                 </div>
                             )}
                         </div>
@@ -204,8 +204,8 @@ export default function ProductDetail() {
                                 onClick={handleBuyNow}
                                 disabled={!product.inStock}
                                 className={`flex items-center justify-center gap-2 px-6 py-4 font-bold text-white rounded-2xl transition-all duration-300 ${!product.inStock
-                                        ? 'bg-gray-700 cursor-not-allowed opacity-60'
-                                        : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-lg shadow-amber-500/25'
+                                    ? 'bg-gray-700 cursor-not-allowed opacity-60'
+                                    : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-lg shadow-amber-500/25'
                                     }`}
                             >
                                 <Zap className="w-5 h-5" />

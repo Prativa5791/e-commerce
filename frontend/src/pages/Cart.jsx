@@ -109,8 +109,8 @@ export default function Cart() {
                                             </button>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xl font-black text-white">${(item.price * item.quantity).toFixed(2)}</p>
-                                            <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                                            <p className="text-xl font-black text-white">${(Number(item.price) * item.quantity).toFixed(2)}</p>
+                                            <p className="text-xs text-gray-500">${Number(item.price).toFixed(2)} each</p>
                                         </div>
                                     </div>
                                 </div>
@@ -129,7 +129,7 @@ export default function Cart() {
                         <div className="space-y-3">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Subtotal ({totalItems} items)</span>
-                                <span className="text-white font-medium">${totalPrice.toFixed(2)}</span>
+                                <span className="text-white font-medium">${Number(totalPrice).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Shipping</span>
@@ -141,7 +141,7 @@ export default function Cart() {
                             </div>
                             <div className="border-t border-white/10 pt-3 flex justify-between">
                                 <span className="text-white font-bold text-lg">Total</span>
-                                <span className="text-2xl font-black gradient-text">${totalPrice.toFixed(2)}</span>
+                                <span className="text-2xl font-black gradient-text">${Number(totalPrice).toFixed(2)}</span>
                             </div>
                         </div>
 

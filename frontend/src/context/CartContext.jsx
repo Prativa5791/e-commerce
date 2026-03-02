@@ -49,13 +49,16 @@ export function CartProvider({ children }) {
         localStorage.setItem('cart', JSON.stringify(state.items))
     }, [state.items])
 
-    const addItem = (product) => dispatch({ type: 'ADD_ITEM', payload: product })
+    const addItem = (product) => dispatch({
+        type: 'ADD_ITEM',
+        payload: { ...product, price: Number(product.price) }
+    })
     const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', payload: id })
     const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } })
     const clearCart = () => dispatch({ type: 'CLEAR_CART' })
 
     const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0)
-    const totalPrice = state.items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+    const totalPrice = state.items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0)
 
     return (
         <CartContext.Provider value={{ items: state.items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
