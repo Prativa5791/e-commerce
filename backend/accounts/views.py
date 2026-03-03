@@ -31,6 +31,7 @@ class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
                 'username': user.username,
                 'email': user.email,
                 'is_seller': user.is_seller,
+                'is_staff': user.is_staff,
             },
             'message': 'User created successfully!!!'
         }, status=status.HTTP_201_CREATED)
@@ -49,6 +50,7 @@ class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
                     'username': user.username,
                     'email': user.email,
                     'is_seller': user.is_seller,
+                    'is_staff': user.is_staff,
                 }
             })
         return Response({'error': 'Invalid credentials'},
@@ -62,4 +64,39 @@ class UserCreationViewSet(viewsets.ReadOnlyModelViewSet):
             'username': user.username,
             'email': user.email,
             'is_seller': user.is_seller,
+            'is_staff': user.is_staff,
         })
+
+    @action(detail=False, methods=['get'], url_path='all-users', permission_classes=[IsAuthenticated])
+    def all_users(self, request):
+        """Admin endpoint to list all users."""
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        users = UserCreation.objects.all().order_by('-date_joined')
+        data = [{
+            'id': u.id,
+            'username': u.username,
+            'email': u.email,
+            'is_seller': u.is_seller,
+            'is_staff': u.is_staff,
+            'is_active': u.is_active,
+            'date_joined': u.date_joined.isoformat(),
+        } for u in users]
+        return Response(data)
+
+    @action(detail=True, methods=['patch'], url_path='toggle-seller', permission_classes=[IsAuthenticated])
+    def toggle_seller(self, request, pk=None):
+        """Admin endpoint to toggle seller status."""
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = UserCreation.objects.get(pk=pk)
+            user.is_seller = not user.is_seller
+            user.save()
+            return Response({
+                'id': user.id,
+                'username': user.username,
+                'is_seller': user.is_seller,
+            })
+        except UserCreation.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

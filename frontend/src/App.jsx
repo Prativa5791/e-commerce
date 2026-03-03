@@ -13,6 +13,7 @@ import Orders from './pages/Orders'
 import Auth from './pages/Auth'
 import Checkout from './pages/Checkout'
 import AdminDashboard from './pages/AdminDashboard'
+import SellerDashboard from './pages/SellerDashboard'
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -42,6 +43,7 @@ function AnimatedRoutes() {
           <Route path="/auth/register" element={<Auth />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/seller-dashboard" element={<SellerDashboard />} />
           {/* 404 fallback */}
           <Route path="*" element={
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">

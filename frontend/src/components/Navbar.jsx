@@ -36,7 +36,7 @@ const navLinks = [
 
 export default function Navbar() {
     const { totalItems } = useCart()
-    const { user, isAuthenticated, logout } = useAuth()
+    const { user, isAuthenticated, isSeller, isAdmin, logout } = useAuth()
     const [cartOpen, setCartOpen] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -113,14 +113,24 @@ export default function Navbar() {
                                                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                                                     className="absolute right-0 mt-2 w-48 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl"
                                                 >
-                                                    {user?.is_seller && (
+                                                    {isAdmin && (
                                                         <Link
                                                             to="/admin-dashboard"
                                                             onClick={() => setDropdownOpen(false)}
                                                             className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                                                         >
                                                             <LayoutDashboard className="w-4 h-4" />
-                                                            Dashboard
+                                                            Admin Panel
+                                                        </Link>
+                                                    )}
+                                                    {(isSeller || isAdmin) && (
+                                                        <Link
+                                                            to="/seller-dashboard"
+                                                            onClick={() => setDropdownOpen(false)}
+                                                            className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                                                        >
+                                                            <LayoutDashboard className="w-4 h-4" />
+                                                            Seller Dashboard
                                                         </Link>
                                                     )}
                                                     <Link
@@ -211,10 +221,16 @@ export default function Navbar() {
                                     ))}
                                     {isAuthenticated ? (
                                         <>
-                                            {user?.is_seller && (
+                                            {isAdmin && (
                                                 <Link to="/admin-dashboard" onClick={() => setMobileOpen(false)}
                                                     className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2">
-                                                    <LayoutDashboard className="w-4 h-4" /> Dashboard
+                                                    <LayoutDashboard className="w-4 h-4" /> Admin Panel
+                                                </Link>
+                                            )}
+                                            {(isSeller || isAdmin) && (
+                                                <Link to="/seller-dashboard" onClick={() => setMobileOpen(false)}
+                                                    className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2">
+                                                    <LayoutDashboard className="w-4 h-4" /> Seller Dashboard
                                                 </Link>
                                             )}
                                             <button onClick={() => { handleLogout(); setMobileOpen(false) }}

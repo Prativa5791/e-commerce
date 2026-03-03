@@ -86,7 +86,7 @@ export default function Checkout() {
                 quantity: item.quantity || 1,
             }))
 
-            const res = await api.post('/orders/orders/checkout/', {
+            const res = await api.post('/orders/checkout/', {
                 items: checkoutItems,
                 ...form,
             })

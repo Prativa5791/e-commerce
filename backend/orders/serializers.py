@@ -4,10 +4,14 @@ from .models import Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
+    product_image = serializers.ReadOnlyField(source='product.image_url')
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'product_name', 'quantity', 'price_at_purchase']
+        fields = [
+            'id', 'order', 'product', 'product_name', 'product_image',
+            'quantity', 'price_at_purchase',
+        ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -16,7 +20,18 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'total_price', 'payment_method', 'payment_status', 'ordered_at', 'items']
+        fields = [
+            'id', 'user', 'status', 'total_price',
+            'payment_method', 'payment_status',
+            'shipping_name', 'shipping_address', 'shipping_phone',
+            'tracking_number', 'estimated_delivery',
+            'ordered_at', 'confirmed_at', 'shipped_at',
+            'delivered_at', 'updated_at', 'items',
+        ]
+        read_only_fields = [
+            'id', 'user', 'ordered_at', 'confirmed_at',
+            'shipped_at', 'delivered_at', 'updated_at',
+        ]
 
 
 class CheckoutItemSerializer(serializers.Serializer):
@@ -34,3 +49,12 @@ class CheckoutSerializer(serializers.Serializer):
         default='cod',
     )
     payment_token = serializers.CharField(required=False, default='', allow_blank=True)
+
+
+class OrderStatusUpdateSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=[
+        'Pending', 'Confirmed', 'Processing',
+        'Shipped', 'Out for Delivery', 'Delivered', 'Canceled',
+    ])
+    tracking_number = serializers.CharField(required=False, allow_blank=True, default='')
+    estimated_delivery = serializers.DateField(required=False, allow_null=True, default=None)

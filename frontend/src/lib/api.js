@@ -20,10 +20,20 @@ api.interceptors.request.use((config) => {
 
 // ─── Products ────────────────────────────────────────────────────────────────
 export const productsApi = {
-    /** GET /api/products/ with optional query params: category, search, in_stock */
+    /** GET /api/products/ with optional query params */
     getAll: (params = {}) => api.get("/products/", { params }),
     /** GET /api/products/:id/ */
     getById: (id) => api.get(`/products/${id}/`),
+    /** POST /api/products/ */
+    create: (data) => api.post("/products/", data),
+    /** PUT /api/products/:id/ */
+    update: (id, data) => api.put(`/products/${id}/`, data),
+    /** PATCH /api/products/:id/ */
+    patch: (id, data) => api.patch(`/products/${id}/`, data),
+    /** DELETE /api/products/:id/ */
+    delete: (id) => api.delete(`/products/${id}/`),
+    /** GET /api/products/analytics/ */
+    analytics: () => api.get("/products/analytics/"),
 };
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -34,14 +44,28 @@ export const authApi = {
     /** POST /api/accounts/users/register/ */
     register: (username, email, password, mobile = "") =>
         api.post("/accounts/users/register/", { username, email, password, mobile }),
+    /** GET /api/accounts/users/me/ */
+    me: () => api.get("/accounts/users/me/"),
+    /** GET /api/accounts/users/all-users/ (admin) */
+    allUsers: () => api.get("/accounts/users/all-users/"),
+    /** PATCH /api/accounts/users/:id/toggle-seller/ */
+    toggleSeller: (id) => api.patch(`/accounts/users/${id}/toggle-seller/`),
 };
 
 // ─── Orders ───────────────────────────────────────────────────────────────────
 export const ordersApi = {
     /** GET /api/orders/ — returns only the current user's orders */
     getAll: () => api.get("/orders/"),
-    /** POST /api/orders/ */
-    create: (data) => api.post("/orders/", data),
+    /** GET /api/orders/:id/ */
+    getById: (id) => api.get(`/orders/${id}/`),
+    /** POST /api/orders/checkout/ */
+    checkout: (data) => api.post("/orders/checkout/", data),
+    /** GET /api/orders/all-orders/ (admin) */
+    allOrders: () => api.get("/orders/all-orders/"),
+    /** PATCH /api/orders/:id/update-status/ */
+    updateStatus: (id, data) => api.patch(`/orders/${id}/update-status/`, data),
+    /** GET /api/orders/analytics/ (admin) */
+    analytics: () => api.get("/orders/analytics/"),
 };
 
 export default api;
