@@ -113,6 +113,14 @@ export default function Navbar() {
                                                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                                                     className="absolute right-0 mt-2 w-48 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl"
                                                 >
+                                                    <Link
+                                                        to="/profile"
+                                                        onClick={() => setDropdownOpen(false)}
+                                                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors border-b border-white/5"
+                                                    >
+                                                        <User className="w-4 h-4" />
+                                                        My Profile
+                                                    </Link>
                                                     {isAdmin && (
                                                         <Link
                                                             to="/admin-dashboard"
@@ -221,6 +229,10 @@ export default function Navbar() {
                                     ))}
                                     {isAuthenticated ? (
                                         <>
+                                            <Link to="/profile" onClick={() => setMobileOpen(false)}
+                                                className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2 border-b border-white/5 mb-1 pb-2">
+                                                <User className="w-4 h-4" /> My Profile
+                                            </Link>
                                             {isAdmin && (
                                                 <Link to="/admin-dashboard" onClick={() => setMobileOpen(false)}
                                                     className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2">

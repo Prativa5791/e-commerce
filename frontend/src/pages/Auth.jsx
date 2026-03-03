@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, LogIn, UserPlus } from 'lucide-react'
+import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, LogIn, UserPlus, MapPin } from 'lucide-react'
 
 export default function Auth() {
     const location = useLocation()
@@ -112,7 +112,7 @@ function Login() {
 
 function Register() {
     const [form, setForm] = useState({
-        username: '', email: '', mobile: '', password: '', confirmPassword: ''
+        username: '', email: '', mobile: '', location: '', password: '', confirmPassword: ''
     })
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState('')
@@ -131,7 +131,7 @@ function Register() {
         }
         setLoading(true)
         try {
-            await register(form.username, form.email, form.password, form.mobile || undefined)
+            await register(form.username, form.email, form.password, form.mobile || undefined, form.location || undefined)
             navigate('/')
         } catch (err) {
             const data = err.response?.data
@@ -192,6 +192,12 @@ function Register() {
                             <Phone className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
                             <input type="tel" placeholder="Mobile (optional)" value={form.mobile}
                                 onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+                                className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
+                        </div>
+                        <div className="relative">
+                            <MapPin className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
+                            <input type="text" placeholder="Location (optional)" value={form.location}
+                                onChange={(e) => setForm({ ...form, location: e.target.value })}
                                 className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
                         </div>
                         <div className="relative">

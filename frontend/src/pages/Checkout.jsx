@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext'
 import api from '../lib/api'
 import {
     MapPin, Phone, User, CreditCard, Truck,
-    ChevronRight, ShieldCheck, CheckCircle, AlertCircle, Banknote
+    ChevronRight, ShieldCheck, CheckCircle, AlertCircle, Banknote, FileText, Download
 } from 'lucide-react'
 
 const paymentMethods = [
@@ -34,7 +34,7 @@ const paymentMethods = [
 ]
 
 export default function Checkout() {
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated, user } = useAuth()
     const { items: cartItems, totalPrice, clearCart } = useCart()
     const navigate = useNavigate()
     const location = useLocation()
@@ -47,9 +47,9 @@ export default function Checkout() {
         : totalPrice
 
     const [form, setForm] = useState({
-        shipping_name: '',
-        shipping_address: '',
-        shipping_phone: '',
+        shipping_name: user?.username || '',
+        shipping_address: user?.location || '',
+        shipping_phone: user?.mobile || '',
         payment_method: 'cod',
     })
     const [loading, setLoading] = useState(false)
@@ -114,11 +114,11 @@ export default function Checkout() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ paddingTop: '100px' }}>
+            <div className="min-h-screen flex items-center justify-center p-4 pb-20" style={{ paddingTop: '100px' }}>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="w-full max-w-md text-center"
+                    className="w-full max-w-2xl text-center"
                 >
                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
                         <motion.div
@@ -138,9 +138,49 @@ export default function Checkout() {
                                 ? 'You can pay when the order is delivered.'
                                 : `Payment processed via ${form.payment_method === 'esewa' ? 'eSewa' : 'Khalti'}.`}
                         </p>
-                        <div className="flex flex-col gap-3">
+
+                        {/* Virtual Bill */}
+                        <div className="bg-white/10 rounded-2xl p-6 mb-8 text-left border border-white/10 relative overflow-hidden">
+                            <div className="absolute -top-4 -right-4 p-4 opacity-5 pointer-events-none">
+                                <Banknote className="w-48 h-48" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-violet-400" /> Virtual Bill
+                            </h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm mb-6 pb-6 border-b border-white/10 relative z-10">
+                                <div>
+                                    <p className="text-gray-400 mb-1">Bill To:</p>
+                                    <p className="text-white font-medium">{form.shipping_name}</p>
+                                    <p className="text-gray-400">{form.shipping_address}</p>
+                                    <p className="text-gray-400">Ph: {form.shipping_phone}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-gray-400 mb-1">Invoice Date:</p>
+                                    <p className="text-white font-medium">{new Date().toLocaleDateString()}</p>
+                                    <p className="text-gray-400 mt-3 mb-1">Order ID:</p>
+                                    <p className="text-violet-400 font-medium">#{orderId}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-3 mb-4 relative z-10">
+                                {items.map((item, idx) => (
+                                    <div key={idx} className="flex justify-between text-sm">
+                                        <span className="text-gray-300">{item.name} <span className="text-gray-500">x {item.quantity || 1}</span></span>
+                                        <span className="text-white font-medium">Rs. {((item.price) * (item.quantity || 1)).toLocaleString()}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex justify-between text-lg font-bold pt-4 border-t border-white/10 relative z-10">
+                                <span className="text-white">Total Amount</span>
+                                <span className="text-emerald-400">Rs. {total.toLocaleString()}</span>
+                            </div>
+                            <button className="mt-6 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 relative z-10" onClick={() => window.print()}>
+                                <Download className="w-5 h-5" /> Download / Print Bill
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <button onClick={() => navigate('/orders')}
-                                className="px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold rounded-xl transition-all">
+                                className="px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                                 View My Orders
                             </button>
                             <button onClick={() => navigate('/products')}

@@ -33,9 +33,10 @@ export function AuthProvider({ children }) {
         return res.data
     }
 
-    const register = async (username, email, password, mobile) => {
+    const register = async (username, email, password, mobile, userLocation) => {
         const payload = { username, email, password }
         if (mobile) payload.mobile = parseInt(mobile)
+        if (userLocation) payload.location = userLocation
         const res = await api.post('/accounts/users/register/', payload)
         setToken(res.data.token)
         setUser(res.data.user)

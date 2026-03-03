@@ -12,6 +12,7 @@ import Cart from './pages/Cart'
 import Orders from './pages/Orders'
 import Auth from './pages/Auth'
 import Checkout from './pages/Checkout'
+import UserProfile from './pages/UserProfile'
 import AdminDashboard from './pages/AdminDashboard'
 import SellerDashboard from './pages/SellerDashboard'
 
@@ -41,6 +42,7 @@ function AnimatedRoutes() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/auth/login" element={<Auth />} />
           <Route path="/auth/register" element={<Auth />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
