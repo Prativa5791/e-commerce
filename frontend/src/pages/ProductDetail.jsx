@@ -5,7 +5,7 @@ import { Star, ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RefreshCw, 
 import { PRODUCTS, getBadgeColor } from '../data/products'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import { reviewsApi, chatApi } from '../lib/api'
+import { productsApi, reviewsApi, chatApi } from '../lib/api'
 import Toast from '../components/Toast'
 import ProductCard from '../components/ProductCard'
 
@@ -168,7 +168,7 @@ export default function ProductDetail() {
     }
 
     const displayRating = avgRating > 0 ? avgRating : (product.rating || 0)
-    const displayCount = reviewsCount > 0 ? reviewsCount : reviewsC
+    const displayCount = reviewsCount > 0 ? reviewsCount : (reviewsC || 0)
 
     return (
         <div className="min-h-screen pt-24 pb-20 px-4">
