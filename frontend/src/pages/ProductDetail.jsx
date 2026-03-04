@@ -88,7 +88,7 @@ export default function ProductDetail() {
     const thePrice = product.price
     const reviewsC = product.reviews_count ?? product.reviews ?? 0
     const inStock = product.in_stock ?? product.inStock ?? true
-    const productFeatures = product.features || []
+    const productFeatures = Array.isArray(product.features) ? product.features : []
 
     const related = PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
     const discount = originalPrice
@@ -154,8 +154,16 @@ export default function ProductDetail() {
             navigate('/auth/login')
             return
         }
+
+        const sellerId = product.seller
+        if (!sellerId) {
+            setToastMsg('Cannot start chat: This is a demo product without a seller.')
+            setToast(true)
+            setTimeout(() => setToast(false), 3000)
+            return
+        }
+
         // Navigate to chat
-        const sellerId = product.seller || 1 // fallback to 1 if mock
         navigate('/chat', { state: { productId: product.id, productName: product.name, sellerId } })
     }
 
@@ -250,7 +258,7 @@ export default function ProductDetail() {
 
                         {/* Features */}
                         <div className="grid grid-cols-2 gap-3">
-                            {productFeatures.map((feat) => (
+                            {productFeatures?.map?.((feat) => (
                                 <div key={feat} className="flex items-center gap-2 glass px-4 py-2.5 rounded-xl">
                                     <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />
                                     <span className="text-gray-300 text-sm">{feat}</span>
@@ -458,14 +466,14 @@ export default function ProductDetail() {
                                 <div className="flex items-center justify-center py-12">
                                     <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
                                 </div>
-                            ) : reviews.length === 0 ? (
+                            ) : !reviews || reviews.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center bg-white/5 border border-white/10 rounded-3xl">
                                     <Star className="w-12 h-12 text-gray-600 mb-3" />
                                     <h3 className="text-lg font-bold text-white mb-1">No reviews yet</h3>
                                     <p className="text-gray-500 text-sm">Be the first to review this product!</p>
                                 </div>
                             ) : (
-                                reviews.map((review, i) => (
+                                Array.isArray(reviews) && reviews.map((review, i) => (
                                     <motion.div
                                         key={review.id}
                                         initial={{ opacity: 0, y: 15 }}

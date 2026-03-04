@@ -59,17 +59,20 @@ export default function Chat() {
                     })
                     // Add room to list if not present, then select it
                     setRooms(prev => {
-                        if (!prev.find(r => r.id === res.data.id)) {
-                            return [res.data, ...prev]
+                        const arr = Array.isArray(prev) ? prev : []
+                        if (!arr.find(r => r.id === res.data.id)) {
+                            return [res.data, ...arr]
                         }
-                        return prev
+                        return arr
                     })
                     // Select it explicitly
                     handleSelectRoom(res.data)
-                    // Clear the location state so we don't re-create endlessly
-                    navigate(location.pathname, { replace: true })
                 } catch (err) {
                     console.error('Failed to create room', err)
+                    alert('Failed to start chat. This could be because the seller no longer exists.')
+                } finally {
+                    // Always clear the location state so we don't re-create endlessly
+                    navigate(location.pathname, { replace: true })
                 }
             }
             createAndSelectRoom()
