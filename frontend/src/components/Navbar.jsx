@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Menu, X, LogOut, User, LayoutDashboard } from 'lucide-react'
+import { ShoppingCart, Menu, X, LogOut, User, LayoutDashboard, MessageCircle } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import CartDrawer from './CartDrawer'
@@ -149,6 +149,14 @@ export default function Navbar() {
                                                         <ShoppingCart className="w-4 h-4" />
                                                         My Orders
                                                     </Link>
+                                                    <Link
+                                                        to="/chat"
+                                                        onClick={() => setDropdownOpen(false)}
+                                                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <MessageCircle className="w-4 h-4" />
+                                                        Messages
+                                                    </Link>
                                                     <button
                                                         onClick={handleLogout}
                                                         className="flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors w-full text-left border-t border-white/10"
@@ -167,6 +175,19 @@ export default function Navbar() {
                                     >
                                         Sign In
                                     </Link>
+                                )}
+
+                                {/* Chat Button */}
+                                {isAuthenticated && (
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => navigate('/chat')}
+                                        className="relative p-2.5 glass rounded-xl hover:bg-white/10 transition-all duration-200"
+                                        aria-label="Open messages"
+                                    >
+                                        <MessageCircle className="w-5 h-5 text-gray-300" />
+                                    </motion.button>
                                 )}
 
                                 {/* Cart Button */}
@@ -245,6 +266,10 @@ export default function Navbar() {
                                                     <LayoutDashboard className="w-4 h-4" /> Seller Dashboard
                                                 </Link>
                                             )}
+                                            <Link to="/chat" onClick={() => setMobileOpen(false)}
+                                                className="text-sm text-gray-400 hover:text-white py-2 px-3 flex items-center gap-2">
+                                                <MessageCircle className="w-4 h-4" /> Messages
+                                            </Link>
                                             <button onClick={() => { handleLogout(); setMobileOpen(false) }}
                                                 className="text-sm text-red-400 hover:text-red-300 py-2 px-3 text-left flex items-center gap-2">
                                                 <LogOut className="w-4 h-4" /> Sign Out

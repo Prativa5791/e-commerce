@@ -15,6 +15,7 @@ import Checkout from './pages/Checkout'
 import UserProfile from './pages/UserProfile'
 import AdminDashboard from './pages/AdminDashboard'
 import SellerDashboard from './pages/SellerDashboard'
+import Chat from './pages/Chat'
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -46,6 +47,7 @@ function AnimatedRoutes() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
+          <Route path="/chat" element={<Chat />} />
           {/* 404 fallback */}
           <Route path="*" element={
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">

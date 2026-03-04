@@ -68,4 +68,30 @@ export const ordersApi = {
     analytics: () => api.get("/orders/analytics/"),
 };
 
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+export const reviewsApi = {
+    /** GET /api/reviews/reviews/product/:productId/ */
+    getByProduct: (productId) => api.get(`/reviews/reviews/product/${productId}/`),
+    /** POST /api/reviews/reviews/ */
+    create: (data) => api.post("/reviews/reviews/", data),
+    /** GET /api/reviews/reviews/my-reviews/ */
+    myReviews: () => api.get("/reviews/reviews/my-reviews/"),
+    /** DELETE /api/reviews/reviews/:id/ */
+    delete: (id) => api.delete(`/reviews/reviews/${id}/`),
+};
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+export const chatApi = {
+    /** GET /api/chat/rooms/ — list all chat rooms for current user */
+    getRooms: () => api.get("/chat/rooms/"),
+    /** POST /api/chat/rooms/ — create or get existing room */
+    createRoom: (data) => api.post("/chat/rooms/", data),
+    /** GET /api/chat/rooms/:id/messages/ — get messages in a room */
+    getMessages: (roomId) => api.get(`/chat/rooms/${roomId}/messages/`),
+    /** POST /api/chat/rooms/:id/send/ — send a message */
+    sendMessage: (roomId, message) => api.post(`/chat/rooms/${roomId}/send/`, { message }),
+    /** GET /api/chat/rooms/unread-count/ */
+    unreadCount: () => api.get("/chat/rooms/unread-count/"),
+};
+
 export default api;

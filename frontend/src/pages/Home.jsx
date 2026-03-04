@@ -1,9 +1,10 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowRight, ShoppingBag, Zap, Star, Shield, Truck, RefreshCw } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, ShoppingBag, Zap, Star, Shield, Truck, RefreshCw, Search, X } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import { FEATURED_PRODUCTS, PRODUCTS } from '../data/products'
+import { productsApi } from '../lib/api'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -45,6 +46,7 @@ const BANNERS = [
 ]
 
 export default function Home() {
+    const navigate = useNavigate()
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
@@ -141,8 +143,10 @@ export default function Home() {
                 </div>
             </section>
 
+
+
             {/* Feature Badges */}
-            <section className="py-12 border-y border-white/10">
+            <section className="py-12 border-y border-white/10 mt-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {FEATURES.map(({ icon: Icon, title, desc }, i) => (

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import api from '../lib/api'
-import { User, Mail, Phone, MapPin, Package, ShoppingBag, Calendar, ChevronRight } from 'lucide-react'
+import { User, Mail, Phone, MapPin, Package, ShoppingBag, Calendar, ChevronRight, X, Receipt, CreditCard, Truck, Hash } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export default function UserProfile() {
     const { user, isAuthenticated } = useAuth()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
+    const [selectedOrder, setSelectedOrder] = useState(null)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -30,6 +31,24 @@ export default function UserProfile() {
 
         fetchOrders()
     }, [isAuthenticated, navigate])
+
+    const getStatusColor = (status) => {
+        const colors = {
+            'Pending': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+            'Confirmed': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+            'Processing': 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+            'Shipped': 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+            'Out for Delivery': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+            'Delivered': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            'Canceled': 'bg-red-500/20 text-red-400 border-red-500/30',
+        }
+        return colors[status] || 'bg-gray-500/20 text-gray-400'
+    }
+
+    const getPaymentLabel = (method) => {
+        const labels = { cod: 'Cash on Delivery', esewa: 'eSewa', khalti: 'Khalti' }
+        return labels[method] || method
+    }
 
     return (
         <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20" style={{ paddingTop: '100px' }}>
@@ -133,24 +152,31 @@ export default function UserProfile() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.05 }}
-                                        className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group"
+                                        className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-violet-500/30 transition-all cursor-pointer group"
+                                        onClick={() => setSelectedOrder(order)}
                                     >
                                         <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 mb-4 pb-4 border-b border-white/10">
                                             <div>
                                                 <p className="text-sm text-gray-400 flex items-center gap-2 mb-1">
-                                                    <Calendar className="w-4 h-4" /> {new Date(order.created_at).toLocaleDateString()}
+                                                    <Calendar className="w-4 h-4" /> {new Date(order.ordered_at || order.created_at).toLocaleDateString()}
                                                 </p>
                                                 <h4 className="text-white font-medium">Order <span className="text-violet-400">#{order.id}</span></h4>
                                             </div>
-                                            <div className="text-right">
-                                                <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white mb-1 uppercase tracking-wider">
-                                                    {order.status}
-                                                </span>
-                                                <p className="text-emerald-400 font-bold">Rs. {Number(order.total_amount).toLocaleString()}</p>
+                                            <div className="text-right flex items-center gap-3">
+                                                <div>
+                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border mb-1 uppercase tracking-wider ${getStatusColor(order.status)}`}>
+                                                        {order.status}
+                                                    </span>
+                                                    <p className="text-emerald-400 font-bold">Rs. {Number(order.total_price || order.total_amount || 0).toLocaleString()}</p>
+                                                </div>
+                                                <div className="hidden md:flex items-center gap-1 text-gray-500 group-hover:text-violet-400 transition-colors">
+                                                    <Receipt className="w-5 h-5" />
+                                                    <span className="text-xs font-medium">View Bill</span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="space-y-3">
-                                            {order.items.map((item, idx) => (
+                                            {order.items?.map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-4 bg-black/20 p-3 rounded-xl">
                                                     <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden flex-shrink-0">
                                                         {item.product_image ? (
@@ -164,7 +190,7 @@ export default function UserProfile() {
                                                         <p className="text-xs text-gray-400 flex gap-3">
                                                             <span>Qty: {item.quantity}</span>
                                                             <span className="text-gray-500">|</span>
-                                                            <span>Rs. {Number(item.price).toLocaleString()} each</span>
+                                                            <span>Rs. {Number(item.price_at_purchase || item.price || 0).toLocaleString()} each</span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -177,6 +203,134 @@ export default function UserProfile() {
                     </div>
                 </motion.div>
             </div>
+
+            {/* ─── BILL MODAL ─────────────────────────────────────────────── */}
+            <AnimatePresence>
+                {selectedOrder && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setSelectedOrder(null)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="bg-[#0f0f1a] border border-white/15 rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Bill Header */}
+                            <div className="relative p-6 pb-4 border-b border-white/10">
+                                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 rounded-t-3xl" />
+                                <button
+                                    onClick={() => setSelectedOrder(null)}
+                                    className="absolute top-4 right-4 p-2 glass rounded-xl hover:bg-white/10 transition-all"
+                                >
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="p-2.5 bg-violet-500/20 rounded-xl">
+                                        <Receipt className="w-6 h-6 text-violet-400" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black text-white">Invoice / Bill</h3>
+                                        <p className="text-gray-500 text-sm">Order #{selectedOrder.id}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Customer Info */}
+                            <div className="p-6 pb-3 space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-white/5 p-3 rounded-xl">
+                                        <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><User className="w-3 h-3" /> Customer</p>
+                                        <p className="text-white font-medium text-sm">{selectedOrder.user || user?.username}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-3 rounded-xl">
+                                        <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Date</p>
+                                        <p className="text-white font-medium text-sm">{new Date(selectedOrder.ordered_at || selectedOrder.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-3 rounded-xl">
+                                        <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><CreditCard className="w-3 h-3" /> Payment</p>
+                                        <p className="text-white font-medium text-sm">{getPaymentLabel(selectedOrder.payment_method)}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-3 rounded-xl">
+                                        <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Hash className="w-3 h-3" /> Status</p>
+                                        <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-semibold border ${getStatusColor(selectedOrder.status)}`}>
+                                            {selectedOrder.status}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Shipping */}
+                                {(selectedOrder.shipping_name || selectedOrder.shipping_address) && (
+                                    <div className="bg-white/5 p-3 rounded-xl">
+                                        <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Truck className="w-3 h-3" /> Shipping To</p>
+                                        <p className="text-white font-medium text-sm">{selectedOrder.shipping_name}</p>
+                                        {selectedOrder.shipping_address && <p className="text-gray-400 text-xs">{selectedOrder.shipping_address}</p>}
+                                        {selectedOrder.shipping_phone && <p className="text-gray-400 text-xs">{selectedOrder.shipping_phone}</p>}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Items Table */}
+                            <div className="px-6 pb-3">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b border-white/10">
+                                            <th className="text-left text-xs text-gray-500 pb-2 font-medium">Item</th>
+                                            <th className="text-center text-xs text-gray-500 pb-2 font-medium">Qty</th>
+                                            <th className="text-right text-xs text-gray-500 pb-2 font-medium">Price</th>
+                                            <th className="text-right text-xs text-gray-500 pb-2 font-medium">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedOrder.items?.map((item, idx) => (
+                                            <tr key={idx} className="border-b border-white/5">
+                                                <td className="py-3">
+                                                    <div className="flex items-center gap-2">
+                                                        {item.product_image && (
+                                                            <img src={item.product_image} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                                                        )}
+                                                        <span className="text-sm text-white truncate max-w-[150px]">{item.product_name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="text-center text-sm text-gray-300 py-3">{item.quantity}</td>
+                                                <td className="text-right text-sm text-gray-300 py-3">Rs. {Number(item.price_at_purchase || item.price || 0).toLocaleString()}</td>
+                                                <td className="text-right text-sm text-white font-medium py-3">Rs. {(Number(item.price_at_purchase || item.price || 0) * item.quantity).toLocaleString()}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Totals */}
+                            <div className="mx-6 mb-6 p-4 bg-gradient-to-br from-violet-600/10 to-fuchsia-600/10 border border-violet-500/20 rounded-2xl">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-gray-400 text-sm">Subtotal</span>
+                                    <span className="text-white font-medium">Rs. {Number(selectedOrder.total_price || selectedOrder.total_amount || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-gray-400 text-sm">Shipping</span>
+                                    <span className="text-emerald-400 font-medium text-sm">Free</span>
+                                </div>
+                                <div className="border-t border-white/10 pt-2 mt-2 flex justify-between items-center">
+                                    <span className="text-white font-bold text-lg">Total</span>
+                                    <span className="text-2xl font-black gradient-text">Rs. {Number(selectedOrder.total_price || selectedOrder.total_amount || 0).toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="px-6 pb-6 text-center">
+                                <p className="text-gray-600 text-xs">Thank you for shopping with Nepali Store 🇳🇵</p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
